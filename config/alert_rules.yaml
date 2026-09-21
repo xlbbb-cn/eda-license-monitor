@@ -1,0 +1,45 @@
+# Prometheus AlertManager 告警规则
+# 将此文件挂载到 Prometheus 的 rules 目录
+
+groups:
+  - name: eda_license_alerts
+    rules:
+      # 规则 1：License 使用率过高
+      - alert: LicenseHighUsage
+        expr: flexlm_feature_used / flexlm_feature_total > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "EDA License 使用率过高"
+          description: "Feature {{ $labels.feature }} 在 {{ $labels.server }} 上使用率已达 {{ $value | humanizePercentage }}，持续超过 5 分钟。"
+
+      # 规则 2：License 全部占满
+      - alert: LicenseFull
+        expr: flexlm_feature_used >= flexlm_feature_total
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "EDA License 已全部占满"
+          description: "Feature {{ $labels.feature }} 在 {{ $labels.server }} 上已无可用 License（{{ $labels.feature_used }}/{{ $labels.feature_total }}）。"
+
+      # 规则 3：License 使用率极低，可能可以缩减
+      - alert: LicenseLowUsage
+        expr: flexlm_feature_used / flexlm_feature_total < 0.2 and flexlm_feature_total > 5
+        for: 24h
+        labels:
+          severity: info
+        annotations:
+          summary: "EDA License 使用率极低，可考虑缩减"
+          description: "Feature {{ $labels.feature }} 在 {{ $labels.server }} 上 24 小时使用率持续低于 20%，当前总数 {{ $labels.feature_total }}。"
+
+      # 规则 4：License Server 不可达
+      - alert: LicenseServerDown
+        expr: up{job="flexlm"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "License Server 不可达"
+          description: "无法连接到 License Server {{ $labels.server }}，请检查网络和 lmgrd 进程。"

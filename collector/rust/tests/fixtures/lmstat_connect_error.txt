@@ -1,0 +1,4 @@
+lmutil - Copyright (c) 1989-2023 Flexera. All Rights Reserved.
+Flexible License Manager status on Thu 6/2/2026 10:25
+
+Error getting status: Cannot connect to license server system. (-15,10:10061 "Windows Sockets: Connection refused")

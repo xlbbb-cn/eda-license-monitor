@@ -1,0 +1,59 @@
+# EDA License Monitor - 主配置文件
+# 复制此文件为 config.local.yaml 并修改实际参数
+
+# Prometheus 服务端口
+prometheus:
+  port: 9091
+  scrape_interval: 30s
+
+# Grafana 服务端口
+grafana:
+  port: 3000
+
+# License Server 列表
+# 支持同时监控多台 License Server
+license_servers:
+  - name: "main-server"
+    host: "192.168.1.100"
+    port: 27000
+    # lmutil 可执行文件路径（不填则自动查找 PATH 中的 lmutil）
+    lmutil_path: ""
+    # 可选：vendor daemon 端口（某些配置下需要）
+    # vendor_port: 27001
+
+  # 多服务器时取消注释
+  # - name: "backup-server"
+  #   host: "192.168.1.101"
+  #   port: 27000
+  #   lmutil_path: ""
+
+# 采集器配置
+collector:
+  # 采集间隔（秒），建议不低于 30 秒
+  # 间隔太短可能触发 License Server 连接限制
+  interval: 30
+  # lmutil 命令超时时间（秒）
+  timeout: 15
+  # 重试次数
+  retries: 3
+
+# 告警规则
+alerts:
+  enabled: true
+  # 使用率超过此阈值时触发告警（0.0 - 1.0）
+  high_usage_threshold: 0.90
+  # 使用率低于此阈值时提示可缩减（0.0 - 1.0）
+  low_usage_threshold: 0.30
+  # 告警恢复间隔（分钟），同一告警在此间隔内不会重复发送
+  repeat_interval: 30
+  # 告警通知方式：webhook / email（仅 Prometheus AlertManager 支持）
+  notify_method: webhook
+  # Webhook URL（如飞书、钉钉、企微机器人）
+  webhook_url: ""
+  # 邮件配置（仅 email 方式需要）
+  email:
+    smtp_host: ""
+    smtp_port: 587
+    from: ""
+    to: ""
+    use_tls: true

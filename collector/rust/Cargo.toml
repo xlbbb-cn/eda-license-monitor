@@ -1,0 +1,41 @@
+[package]
+name = "eda-license-collector"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+description = "FlexLM (lmutil) license usage collector exposing Prometheus metrics — Rust port of collector/python"
+license = "MIT"
+
+[lib]
+name = "eda_license_collector"
+path = "src/lib.rs"
+
+[[bin]]
+name = "eda-license-collector"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1"
+axum = "0.8"
+chrono = "0.4"
+clap = { version = "4", features = ["derive"] }
+prometheus = "0.13"
+regex = "1"
+serde = { version = "1", features = ["derive"] }
+serde_yaml = "0.9"
+tokio = { version = "1", features = [
+    "macros",
+    "net",
+    "process",
+    "rt-multi-thread",
+    "signal",
+    "sync",
+    "time",
+] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["chrono", "env-filter"] }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = "symbols"

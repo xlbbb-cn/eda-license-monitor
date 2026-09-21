@@ -1,0 +1,26 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: ['alertname']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 30m
+  receiver: 'default'
+
+receivers:
+  - name: 'default'
+    # 默认不发送通知，取消注释以下配置启用
+    # webhook_configs:
+    #   - url: 'http://your-webhook-endpoint/alerts'
+    #     send_resolved: true
+
+    # 飞书机器人
+    # webhook_configs:
+    #   - url: 'https://open.feishu.cn/open-apis/bot/v2/hook/your-token'
+    #     send_resolved: true
+
+    # 钉钉机器人
+    # webhook_configs:
+    #   - url: 'https://oapi.dingtalk.com/robot/send?access_token=your-token'
+    #     send_resolved: true

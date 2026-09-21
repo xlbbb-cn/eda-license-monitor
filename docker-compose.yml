@@ -1,0 +1,103 @@
+version: "3.8"
+
+services:
+  # ── Rust 采集器（默认，生产环境推荐） ──
+  # 网络别名 collector 与 config/prometheus.yml 的抓取目标一致，
+  # 因此切换 Python / Rust 实现时不需要改 Prometheus 配置。
+  collector-rust:
+    build:
+      context: ./collector/rust
+      dockerfile: Dockerfile
+    container_name: eda-license-collector
+    restart: unless-stopped
+    volumes:
+      - ./config:/app/config:ro
+      # lmutil 是厂商专有二进制，如需在容器内采集，从宿主机挂载，
+      # 并在 config/config.yaml 中设置 lmutil_path: /opt/flexlm/lmutil
+      # - /opt/flexlm:/opt/flexlm:ro
+    environment:
+      - TZ=Asia/Shanghai
+      # - RUST_LOG=debug
+    networks:
+      eda-monitor:
+        aliases:
+          - collector
+
+  # ── Python 采集器（可选，与 Rust 版二选一） ──
+  # 切换：docker compose stop collector-rust
+  #       docker compose --profile python up -d collector-python
+  # 不要同时启用两个采集器：两者会向 Prometheus 上报同名的重复指标序列。
+  collector-python:
+    profiles:
+      - python
+    build:
+      context: ./collector/python
+      dockerfile: Dockerfile
+    container_name: eda-license-collector-python
+    restart: unless-stopped
+    volumes:
+      - ./config:/app/config:ro
+      # - /opt/flexlm:/opt/flexlm:ro
+    environment:
+      - TZ=Asia/Shanghai
+    networks:
+      eda-monitor:
+        aliases:
+          - collector
+
+  # ── Prometheus 时序数据库 ──
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: eda-license-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./config/alert_rules.yaml:/etc/prometheus/alert_rules.yaml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=90d'
+      - '--web.enable-lifecycle'
+    networks:
+      - eda-monitor
+
+  # ── Grafana 可视化仪表盘 ──
+  grafana:
+    image: grafana/grafana:latest
+    container_name: eda-license-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=eda-license-2025
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/var/lib/grafana/dashboards/overview.json
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/provisioning/dashboards:/var/lib/grafana/dashboards:ro
+    networks:
+      - eda-monitor
+
+  # ── Prometheus 告警管理器（可选） ──
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: eda-license-alertmanager
+    restart: unless-stopped
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./config/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    networks:
+      - eda-monitor
+
+volumes:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  eda-monitor:
+    driver: bridge

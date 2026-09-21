@@ -1,0 +1,106 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "License 使用量趋势",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "fillOpacity": 10, "lineWidth": 2, "stacking": { "mode": "none" } },
+          "min": 0
+        }
+      },
+      "options": {
+        "tooltip": { "mode": "multi" },
+        "legend": { "displayMode": "table", "placement": "right", "calcs": ["lastNotNull", "max", "mean"] }
+      },
+      "targets": [
+        {
+          "expr": "flexlm_feature_total",
+          "legendFormat": "{{ feature }} (总数)",
+          "refId": "A"
+        },
+        {
+          "expr": "flexlm_feature_used",
+          "legendFormat": "{{ feature }} (已用)",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "各 Feature 使用率趋势",
+      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 11 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0, "max": 1,
+          "custom": { "fillOpacity": 20, "lineWidth": 1 }
+        }
+      },
+      "options": {
+        "tooltip": { "mode": "multi" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "targets": [
+        {
+          "expr": "flexlm_feature_used / flexlm_feature_total",
+          "legendFormat": "{{ feature }}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "用户数趋势",
+      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 11 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "fieldConfig": {
+        "defaults": { "min": 0, "custom": { "fillOpacity": 15, "lineWidth": 2 } }
+      },
+      "options": {
+        "tooltip": { "mode": "multi" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "targets": [
+        {
+          "expr": "flexlm_feature_users",
+          "legendFormat": "{{ feature }}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "采集耗时与成功率",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 22 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "expr": "flexlm_scrape_duration_seconds",
+          "legendFormat": "{{ server }} (耗时)",
+          "refId": "A"
+        },
+        {
+          "expr": "flexlm_server_status",
+          "legendFormat": "{{ server }} (状态)",
+          "refId": "B"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["eda", "license", "trend"],
+  "time": { "from": "now-7d", "to": "now" },
+  "title": "EDA License Trend Analysis",
+  "uid": "eda-license-trend",
+  "version": 1
+}

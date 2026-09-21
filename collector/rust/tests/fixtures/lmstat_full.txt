@@ -1,0 +1,28 @@
+lmutil - Copyright (c) 1989-2023 Flexera. All Rights Reserved.
+Flexible License Manager status on Thu 6/2/2026 10:23
+
+[Detecting lmgrd processes...] License server status: 27000@licsrv01
+    License file(s) on licsrv01: /opt/flexlm/licenses/synopsys.dat:
+
+licsrv01: license server UP (MASTER) v11.19.6
+
+Vendor daemon status (on licsrv01):
+
+   snpslmd: UP v11.19.6
+
+Feature usage info:
+
+Users of vcs:  (Total of 20 licenses issued;  Total of 12 licenses in use)
+
+  "vcs" v2023.06, vendor: snpslmd
+
+    jsmith desktop01:0 /dev/pts/3 06/02/2026 10:01 (vcs)
+    lzhang builder02 06/02/2026 09:48 (vcs)
+    qzhou laptop03:0 06/02/2026 11:20 (vcs)
+
+Users of verdi:  (Total of 10 licenses issued;  Total of 3 licenses in use)
+
+  "verdi" L-2016.06, vendor: snpslmd
+
+    awu server04:0 /dev/pts/1 06/02/2026 08:30 (verdi)
+    fchen server05 06/02/2026 09:05 (verdi)

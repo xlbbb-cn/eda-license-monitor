@@ -1,0 +1,6 @@
+Feature usage summary (legacy lmstat layout)
+
+  vcs                 2023.06     synopsys    01-jan-00   20    12
+  verdi               L-2016.06   snpslmd     lifetime    10    3
+
+xcelium: 40 licenses, 25 in use
