@@ -1,0 +1,51 @@
+# Python 采集器打包配置（用于构建 wheel）
+#
+# 运行时依赖与同目录的 requirements.txt 保持一致（Docker 镜像仍使用 requirements.txt）。
+#
+# 本地构建 wheel：
+#   pip install build
+#   python -m build --wheel collector/python
+#
+# 安装后可用与 Rust 版同名同参数的命令行入口：
+#   eda-license-collector -c config/config.yaml --once
+
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eda-license-monitor"
+version = "0.1.0"
+description = "FlexLM (lmutil) EDA license usage collector exposing Prometheus metrics — Python implementation"
+readme = { text = """
+FlexLM (lmutil) EDA License 使用率采集器（Python 版）。
+
+- 定时执行 `lmutil lmstat -a -c <port>@<host>` 并解析 Feature / 用户维度使用数据
+- 暴露 `flexlm_*` 系列 Prometheus 指标（与 Rust 版同名同标签）
+- 与 Rust 版共享同一套 `config/config.yaml`、告警规则和 Grafana 仪表盘
+""", content-type = "text/markdown" }
+requires-python = ">=3.9"
+license = "MIT"
+keywords = ["flexlm", "lmutil", "eda", "license", "prometheus", "monitoring"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: System Administrators",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Topic :: System :: Monitoring",
+]
+dependencies = [
+    "prometheus-client>=0.17.0",
+    "PyYAML>=6.0",
+]
+
+[project.scripts]
+eda-license-collector = "prometheus_exporter:main"
+
+[project.urls]
+Homepage = "https://github.com/xlbbb-cn/eda-license-monitor"
+Source = "https://github.com/xlbbb-cn/eda-license-monitor/tree/main/collector/python"
+
+[tool.setuptools]
+# 采集器只有两个顶层模块，直接以模块形式安装（不做包目录改造）
+py-modules = ["lmutil_parser", "prometheus_exporter"]

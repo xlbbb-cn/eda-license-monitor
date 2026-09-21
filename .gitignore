@@ -6,3 +6,8 @@ __pycache__/
 .venv/
 venv/
 node_modules/
+
+# Python 打包产物（collector/python）
+build/
+dist/
+*.egg-info/
