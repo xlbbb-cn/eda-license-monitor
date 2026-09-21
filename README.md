@@ -52,6 +52,22 @@ docker compose --profile python up -d collector-python
 | Prometheus | http://localhost:9090 | 查看采集状态和原始指标 |
 | Metrics | http://localhost:9091/metrics | 采集器暴露的 Prometheus 指标端点 |
 
+### 从 Release 下载（免编译）
+
+部署机器上没有 Docker，也不想装 Rust 工具链，可以直接用 Release 里的预编译产物：
+
+```bash
+# Rust 采集器：静态链接（musl），无运行时依赖，CentOS 6.8+ 可用
+curl -LO https://github.com/xlbbb-cn/eda-license-monitor/releases/download/v1.0.1/eda-license-collector-v1.0.1-linux-x86_64-static.tar.gz
+tar xzf eda-license-collector-v1.0.1-linux-x86_64-static.tar.gz
+./eda-license-collector -c config/config.yaml --once
+
+# Python 采集器：装 wheel，不用 clone 仓库
+pip install https://github.com/xlbbb-cn/eda-license-monitor/releases/download/v1.0.1/eda_license_monitor-0.1.0-py3-none-any.whl
+```
+
+> 上面的版本号是 v1.0.1。新版本请到 [Releases](https://github.com/xlbbb-cn/eda-license-monitor/releases) 取对应的下载地址。
+
 ### 手动部署
 
 选择一种语言的采集器：
@@ -212,7 +228,7 @@ https://raw.githubusercontent.com/xlbbb-cn/eda-license-monitor/main/grafana/prov
 <details>
 <summary><b>Q: 采集器会不会打挂 License Server？</b></summary>
 
-不会。默认 30 秒采集一次，每次只发送一个 `lmutil lmstat -a` 请求，对 License Server 的负载可以忽略不计。建议采集间隔不低于 15 秒。
+不会。默认 30 秒采集一次，每次只发送一个 `lmutil lmstat -a` 请求，对 License Server 的负载可以忽略不计。建议采集间隔不低于 30 秒（见 `config/config.yaml` 的 `collector.interval`）；License Server 连接数紧张时，生产环境可以用 60 秒。
 </details>
 
 <details>
