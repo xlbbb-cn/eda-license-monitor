@@ -1,16 +1,16 @@
 # 说明：仅使用官方 actions，全部为 node24 版本（v7）——自托管 runner 需 >= 2.327.1；
 # 若 runner 版本较旧，把 checkout@v7 / setup-python@v7 / upload-artifact@v7
 # 分别降级为 @v4 / @v5 / @v4 即可。
+#
+# 触发方式：仅在打 tag（v*）时运行。CI 编译 Linux Rust 可执行文件并打包 Python wheel，
+# 产物在对应 workflow run 的 Artifacts 中下载；日常 push / PR 不触发。
+# 如需手动触发，加上 workflow_dispatch 即可。
 
 name: CI
 
 on:
   push:
-    branches: [main]
     tags: ["v*"]
-  pull_request:
-    branches: [main]
-  workflow_dispatch:
 
 permissions:
   contents: read
