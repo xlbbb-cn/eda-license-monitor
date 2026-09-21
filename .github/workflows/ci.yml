@@ -2,8 +2,9 @@
 # 若 runner 版本较旧，把 checkout@v7 / setup-python@v7 / upload-artifact@v7
 # 分别降级为 @v4 / @v5 / @v4 即可。
 #
-# 触发方式：仅在打 tag（v*）时运行。CI 编译 Linux Rust 可执行文件并打包 Python wheel，
-# 产物在对应 workflow run 的 Artifacts 中下载；日常 push / PR 不触发。
+# 触发方式：仅在打 tag（v*）时运行。CI 编译静态链接的 Linux Rust 可执行文件（musl、非 PIE）
+# 并打包 Python wheel：产物既在对应 workflow run 的 Artifacts 中下载，也会作为附件
+# 自动发布到同名的 GitHub Release；日常 push / PR 不触发。
 # 如需手动触发，加上 workflow_dispatch 即可。
 
 name: CI
@@ -118,3 +119,43 @@ jobs:
           name: python-wheel
           path: collector/python/dist/*.whl
           if-no-files-found: error
+
+  # ── 打 tag 时创建 GitHub Release，并把产物作为附件上传 ──────────────
+  release:
+    name: GitHub Release
+    needs: [rust-linux, python-wheel]
+    runs-on: ubuntu-latest
+    # 顶部 permissions 是只读，创建 Release 需要给本 job 单独开写权限
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # 下载前面两个 job 上传的 artifact，zip 会被自动解包，得到原始文件
+      - name: Download artifacts
+        uses: actions/download-artifact@v7
+        with:
+          path: dist
+
+      - name: Package release assets
+        run: |
+          mkdir -p staging release
+          cp dist/eda-license-collector-linux-x86_64-static/eda-license-collector staging/
+          cp collector/rust/README.md staging/
+          chmod +x staging/eda-license-collector
+          # 打成 tar.gz：HTTP 下载不保留可执行位，解包后权限自带 +x
+          tar -czf "release/eda-license-collector-${GITHUB_REF_NAME}-linux-x86_64-static.tar.gz" -C staging .
+          cp dist/python-wheel/*.whl release/
+          ls -l release
+
+      # gh 已预装在 GitHub runner 上，用 GITHUB_TOKEN 直接创建 Release
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --title "${GITHUB_REF_NAME}" \
+            --generate-notes \
+            release/*
