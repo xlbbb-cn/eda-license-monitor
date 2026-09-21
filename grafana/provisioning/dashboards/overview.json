@@ -10,7 +10,7 @@
       "type": "stat",
       "title": "监控中的 License Server",
       "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
         "defaults": { "thresholds": { "steps": [{ "color": "green", "value": null }] } }
       },
@@ -26,7 +26,7 @@
       "type": "stat",
       "title": "License 总数",
       "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
         "defaults": { "thresholds": { "steps": [{ "color": "blue", "value": null }] } }
       },
@@ -42,7 +42,7 @@
       "type": "stat",
       "title": "当前已使用",
       "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
         "defaults": { "thresholds": { "steps": [{ "color": "orange", "value": null }] } }
       },
@@ -58,7 +58,7 @@
       "type": "stat",
       "title": "总体使用率",
       "gridPos": { "h": 4, "w": 4, "x": 12, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
         "defaults": {
           "unit": "percentunit",
@@ -84,13 +84,13 @@
       "type": "stat",
       "title": "活跃 Features",
       "gridPos": { "h": 4, "w": 4, "x": 16, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
         "defaults": { "thresholds": { "steps": [{ "color": "purple", "value": null }] } }
       },
       "targets": [
         {
-          "expr": "count(flexlm_feature_used > 0)",
+          "expr": "(count(flexlm_feature_used > 0) or count(flexlm_feature_used) * 0)",
           "legendFormat": "Active",
           "refId": "A"
         }
@@ -100,7 +100,7 @@
       "type": "stat",
       "title": "告警状态",
       "gridPos": { "h": 4, "w": 4, "x": 20, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
         "defaults": {
           "thresholds": {
@@ -123,7 +123,7 @@
       "type": "table",
       "title": "各 Feature 使用详情",
       "gridPos": { "h": 10, "w": 24, "x": 0, "y": 5 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
         "defaults": {},
         "overrides": [
@@ -196,7 +196,7 @@
       "type": "timeseries",
       "title": "各 Feature 使用率趋势 (24h)",
       "gridPos": { "h": 10, "w": 24, "x": 0, "y": 16 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
         "defaults": {
           "unit": "percentunit",
@@ -224,5 +224,5 @@
   "time": { "from": "now-24h", "to": "now" },
   "title": "EDA License Overview",
   "uid": "eda-license-overview",
-  "version": 1
+  "version": 2
 }

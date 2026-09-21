@@ -84,6 +84,8 @@ cargo build --release
 ./target/release/eda-license-collector -c ../../config/config.yaml
 ```
 
+> 需要开机自启、崩溃自动重启（裸机生产环境）？见 [裸机部署与 systemd 服务化](docs/bare-metal-deployment.md)。
+
 ### 配置
 
 只需修改 `config/config.yaml` 中的一个字段：
@@ -160,6 +162,16 @@ python collector/rust/tests/python_parity_check.py
 - **一键部署**：Docker Compose 开箱即用
 
 ## 仪表盘说明
+
+`docker compose up -d` 会通过 Grafana file provisioning 自动导入以下三个仪表盘。如果你已经有自己的 Grafana / Prometheus，只想拿仪表盘，可以直接从 GitHub raw 导入，不需要克隆仓库：
+
+```text
+https://raw.githubusercontent.com/xlbbb-cn/eda-license-monitor/main/grafana/provisioning/dashboards/overview.json
+https://raw.githubusercontent.com/xlbbb-cn/eda-license-monitor/main/grafana/provisioning/dashboards/trend.json
+https://raw.githubusercontent.com/xlbbb-cn/eda-license-monitor/main/grafana/provisioning/dashboards/users.json
+```
+
+> 仪表盘内写死了数据源 `uid: prometheus`，你的数据源 uid 不匹配时面板会显示 No data；完整注意事项见[快速开始](docs/quickstart.md#导入-grafana-仪表盘)。
 
 ### Overview（总览）
 

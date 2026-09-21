@@ -10,7 +10,7 @@
       "type": "table",
       "title": "Feature 使用排行（按使用率降序）",
       "gridPos": { "h": 12, "w": 24, "x": 0, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
         "defaults": {},
         "overrides": [
@@ -80,7 +80,7 @@
       "type": "bargauge",
       "title": "低使用率 Feature（可能可以缩减）",
       "gridPos": { "h": 10, "w": 24, "x": 0, "y": 13 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
         "defaults": {
           "unit": "percentunit",
