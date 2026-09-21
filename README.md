@@ -4,8 +4,8 @@
 
 > 芯片公司最贵的资源不在服务器机房，在 lmutil 的输出里。
 
-<!-- 截图放这里：部署后替换为实际 Grafana 仪表盘截图 -->
-<!-- ![Dashboard](docs/screenshots/overview.png) -->
+
+ ![Dashboard](docs/screenshots/0.png) 
 
 [快速开始](#快速开始) · [为什么要做](#为什么要做) · [架构设计](#架构设计) · [Python vs Rust](#python-vs-rust) · [FAQ](#常见问题)
 
@@ -176,14 +176,17 @@ https://raw.githubusercontent.com/xlbbb-cn/eda-license-monitor/main/grafana/prov
 ### Overview（总览）
 
 6 个核心指标卡片 + Feature 使用详情表 + 24h 使用率趋势图
+![Dashboard](docs/screenshots/0.png)
 
 ### Trend Analysis（趋势分析）
 
 多维度趋势图：License 总数 vs 已用、使用率变化、用户数变化、采集性能
+![Dashboard](docs/screenshots/1.png)
 
 ### User Analysis（用户分析）
 
 使用排行表（按使用率降序）、低使用率 Feature 识别（辅助续约决策）
+![Dashboard](docs/screenshots/3.png)
 
 ## Prometheus 指标
 
