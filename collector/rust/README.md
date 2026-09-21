@@ -21,13 +21,15 @@
 > # 在现代 Linux 或 CI 上构建，再把二进制拷到目标机器
 > sudo apt-get install -y musl-tools            # 提供 musl-gcc
 > rustup target add x86_64-unknown-linux-musl
-> CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=musl-gcc \
->   cargo build --release --locked --target x86_64-unknown-linux-musl
+> export CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=musl-gcc
+> export RUSTFLAGS="-C relocation-model=static"   # 产出非 PIE 的 ET_EXEC，老内核加载最稳
+> cargo build --release --locked --target x86_64-unknown-linux-musl
 > ```
 >
-> 产物 `target/x86_64-unknown-linux-musl/release/eda-license-collector` 可在 CentOS 6.8 及以上、
-> Debian / Ubuntu 等发行版直接运行；打 tag 时 CI 会自动产出同名文件
-> （artifact 名 `eda-license-collector-linux-x86_64-static`）。
+> 产物 `target/x86_64-unknown-linux-musl/release/eda-license-collector`
+> 是完全静态、非 PIE 的可执行文件（`DT_NEEDED` 为 0，不依赖 glibc），
+> 可在 CentOS 6.8 及以上、Debian / Ubuntu 等发行版直接运行；
+> 打 tag 时 CI 会自动产出同名文件（artifact 名 `eda-license-collector-linux-x86_64-static`）。
 
 ### 本地运行
 

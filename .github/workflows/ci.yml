@@ -58,19 +58,24 @@ jobs:
           rustup target add x86_64-unknown-linux-musl
           musl-gcc --version
 
-      - name: Build static binary (musl)
+      - name: Build static binary (musl, non-PIE)
+        # -C relocation-model=static：产出传统 ET_EXEC 静态可执行文件（而非 static-pie），
+        # 避开极老内核/发行版加载 PIE 主程序的兼容性风险；代价是该二进制无 ASLR 随机化。
         run: cargo build --release --locked --target x86_64-unknown-linux-musl
         env:
           CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER: musl-gcc
+          RUSTFLAGS: "-C relocation-model=static"
 
-      - name: Verify binary is static
+      - name: Verify binary is static and non-PIE
         working-directory: collector/rust
         run: |
           bin=target/x86_64-unknown-linux-musl/release/eda-license-collector
           file "$bin"
+          elf_type=$(readelf -h "$bin" | awk '/Type:/ {print $2}')
           needed=$(readelf -d "$bin" | grep -c '(NEEDED)' || true)
-          echo "DT_NEEDED entries: $needed"
-          test "$needed" -eq 0
+          echo "ELF type: $elf_type, DT_NEEDED entries: $needed"
+          test "$elf_type" = "EXEC"   # 非 PIE：老内核/老发行版加载兼容性最好
+          test "$needed" -eq 0        # 完全静态：不依赖 glibc（CentOS 6.8 为 glibc 2.12）
           "$bin" --version
 
       - name: Upload static Linux binary
