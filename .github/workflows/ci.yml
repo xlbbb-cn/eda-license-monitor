@@ -48,20 +48,36 @@ jobs:
       - name: Clippy
         run: cargo clippy --all-targets --locked -- -D warnings
 
-      # 产物为动态链接 glibc 的 x86_64 二进制；如需完全静态可改为
-      # musl 目标：rustup target add x86_64-unknown-linux-musl
-      #          cargo build --release --locked --target x86_64-unknown-linux-musl
-      - name: Build release binary
-        run: cargo build --release --locked
+      # 目标系统最低为 CentOS 6.8（glibc 2.12），而 Rust 标准库的 x86_64-unknown-linux-gnu 目标
+      # 自 Rust 1.64 起要求 glibc >= 2.17，因此对外产物改用 musl 静态链接：
+      # 不依赖任何 glibc 版本，CentOS 6.8 / 7 / 8 / 9、Debian、Ubuntu 均可直接运行。
+      - name: Install musl toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends musl-tools
+          rustup target add x86_64-unknown-linux-musl
+          musl-gcc --version
 
-      - name: Smoke test binary
-        run: ./target/release/eda-license-collector --version
+      - name: Build static binary (musl)
+        run: cargo build --release --locked --target x86_64-unknown-linux-musl
+        env:
+          CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER: musl-gcc
 
-      - name: Upload Linux binary
+      - name: Verify binary is static
+        working-directory: collector/rust
+        run: |
+          bin=target/x86_64-unknown-linux-musl/release/eda-license-collector
+          file "$bin"
+          needed=$(readelf -d "$bin" | grep -c '(NEEDED)' || true)
+          echo "DT_NEEDED entries: $needed"
+          test "$needed" -eq 0
+          "$bin" --version
+
+      - name: Upload static Linux binary
         uses: actions/upload-artifact@v7
         with:
-          name: eda-license-collector-linux-x86_64
-          path: collector/rust/target/release/eda-license-collector
+          name: eda-license-collector-linux-x86_64-static
+          path: collector/rust/target/x86_64-unknown-linux-musl/release/eda-license-collector
           if-no-files-found: error
 
   # ── Python 采集器：打包 wheel ────────────────────────────────────────

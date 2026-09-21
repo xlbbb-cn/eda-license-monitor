@@ -11,6 +11,24 @@
 
 前置条件：Rust 1.85+（依赖树中 clap / indexmap 等使用 edition 2024）与 Cargo。
 
+> **老系统（CentOS 6.8 / RHEL 6 等）请用 musl 静态二进制**
+>
+> CentOS 6.8 的 glibc 是 2.12，而 Rust 官方 `x86_64-unknown-linux-gnu` 目标自 1.64 起要求
+> glibc ≥ 2.17 —— 这类机器上既装不了 rustup 工具链，也跑不了动态链接的产物。
+> 因此对老系统请构建 **musl 静态链接**版本（不依赖任何 `.so`）：
+>
+> ```bash
+> # 在现代 Linux 或 CI 上构建，再把二进制拷到目标机器
+> sudo apt-get install -y musl-tools            # 提供 musl-gcc
+> rustup target add x86_64-unknown-linux-musl
+> CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=musl-gcc \
+>   cargo build --release --locked --target x86_64-unknown-linux-musl
+> ```
+>
+> 产物 `target/x86_64-unknown-linux-musl/release/eda-license-collector` 可在 CentOS 6.8 及以上、
+> Debian / Ubuntu 等发行版直接运行；打 tag 时 CI 会自动产出同名文件
+> （artifact 名 `eda-license-collector-linux-x86_64-static`）。
+
 ### 本地运行
 
 ```bash
